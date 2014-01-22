@@ -236,6 +236,7 @@ class GerritConnection(BaseConnection):
         self.keepalive = int(self.connection_config.get('keepalive', 60))
         self.strip_branch_ref = bool(self.connection_config.get(
             'strip_branch_ref'))
+        self.git_avoid_http = bool(self.connection_config.get('git_avoid_http', False))
         self.watcher_thread = None
         self.event_queue = None
         self.client = None
@@ -277,6 +278,11 @@ class GerritConnection(BaseConnection):
 
     def eventDone(self):
         self.event_queue.task_done()
+
+    def git_upload_pack(self, project):
+        cmd = 'git upload-pack %s' % (project)
+        out, err = self._ssh(cmd, '0000')
+        return out
 
     def review(self, project, change, message, action={}):
         cmd = 'gerrit review --project %s' % project
@@ -407,20 +413,31 @@ class GerritConnection(BaseConnection):
             raise Exception("Gerrit error executing %s" % command)
         return (out, err)
 
-    def getInfoRefs(self, project):
-        url = "%s/p/%s/info/refs?service=git-upload-pack" % (
-            self.baseurl, project)
-        try:
-            data = urllib.request.urlopen(url).read()
-        except:
-            self.log.error("Cannot get references from %s" % url)
-            raise  # keeps urllib error informations
-        ret = {}
-        read_headers = False
+    def _getInfoRefs(self, project):
+        if self.git_avoid_http:
+            try:
+                data = self.gerrit.git_upload_pack(project)
+                if not data:
+                    raise Exception(
+                        "Cann't access gerrit repository of %s", project)
+            except:
+                self.log.error("Cannot get references of %s" % project)
+                raise  # keeps gerrit ssh error informations
+        else:
+            url = "%s/p/%s/info/refs?service=git-upload-pack" % (
+                self.baseurl, project)
+            try:
+                data = urllib.request.urlopen(url).read()
+            except:
+                self.log.error("Cannot get references from %s" % url)
+                raise  # keeps urllib error informations
+            if data[4] != '#':
+                raise Exception("Gerrit repository does not support "
+                                "git-upload-pack")
+        # HTTP has header, but ssh doesn't
+        read_headers = self.git_avoid_http
         read_advertisement = False
-        if data[4] != '#':
-            raise Exception("Gerrit repository does not support "
-                            "git-upload-pack")
+        ret = {}
         i = 0
         while i < len(data):
             if len(data) - i < 4:

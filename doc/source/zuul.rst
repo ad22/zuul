@@ -86,6 +86,12 @@ webapp
   Port on which the webapp is listening (default: 8001).
   ``port=8008``
 
+**git_avoid_http**
+  Whether legacy http method should be used to fetch gerrit refs. The http
+  interface doesn't support authentication and is insecure. SSH will be use
+  instead when the option is set true which is recommended. (default: False)
+  ``git_avoid_http=false``
+
 zuul
 """"
 
