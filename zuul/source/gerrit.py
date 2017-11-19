@@ -46,7 +46,7 @@ class GerritSource(BaseSource):
     def getRefSha(self, project, ref):
         refs = {}
         try:
-            refs = self.connection.getInfoRefs(project)
+            refs = self.connection._getInfoRefs(project)
         except:
             self.log.exception("Exception looking for ref %s" %
                                ref)

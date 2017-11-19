@@ -416,7 +416,7 @@ class GerritConnection(BaseConnection):
     def _getInfoRefs(self, project):
         if self.git_avoid_http:
             try:
-                data = self.gerrit.git_upload_pack(project)
+                data = self.git_upload_pack(project)
                 if not data:
                     raise Exception(
                         "Cann't access gerrit repository of %s", project)
