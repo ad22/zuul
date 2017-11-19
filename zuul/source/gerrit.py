@@ -242,7 +242,19 @@ class GerritSource(BaseSource):
             change.patchset = data['currentPatchSet']['number']
 
         if 'project' not in data:
-            raise exceptions.ChangeNotFound(change.number, change.patchset)
+            found = False
+            start = time.time()
+            while time.time() - start < 15:
+                self.log.info("Change %s not found, retrying" % (change, ))
+                data = self.connection.query(change.number)
+                if 'project' in data:
+                    found = True
+                    break
+                time.sleep(self.replication_retry_interval)
+            if not found:
+                raise exceptions.ChangeNotFound(change.number, change.patchset)
+            change._data = data
+
         change.project = self.sched.getProject(data['project'])
         change.branch = data['branch']
         change.url = data['url']
