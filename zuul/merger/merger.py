@@ -140,6 +140,14 @@ class Repo(object):
         repo = self.createRepoObject()
         self.log.debug("Cherry-picking %s" % ref)
         self.fetch(ref)
+        cat_file = repo.git.cat_file('-p', 'FETCH_HEAD').splitlines()
+        parents = [l for l in cat_file if l.startswith('parent')]
+        if len(parents) > 1:
+            self.log.debug("Merge commit detected, falling back to merge-resolve strategy")
+            args = ['-s', 'resolve', 'FETCH_HEAD']
+            self.log.debug("Merging %s with args %s" % (ref, args))
+            repo.git.merge(*args)
+            return repo.head.commit
         repo.git.cherry_pick("FETCH_HEAD")
         return repo.head.commit
 
