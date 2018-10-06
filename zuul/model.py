@@ -1024,9 +1024,6 @@ class NullChange(Changeish):
         return None
 
     def equals(self, other):
-        if (self.project == other.project
-            and other._id() is None):
-            return True
         return False
 
     def isUpdateOf(self, other):
