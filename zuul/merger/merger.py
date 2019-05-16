@@ -16,6 +16,7 @@
 import git
 import os
 import logging
+import re
 
 import zuul.model
 
@@ -141,7 +142,7 @@ class Repo(object):
         self.log.debug("Cherry-picking %s" % ref)
         self.fetch(ref)
         cat_file = repo.git.cat_file('-p', 'FETCH_HEAD').splitlines()
-        parents = [l for l in cat_file if l.startswith('parent')]
+        parents = [l for l in cat_file if re.search('parent [0-9a-f]{40}', l)]
         if len(parents) > 1:
             self.log.debug("Merge commit detected, falling back to merge-resolve strategy")
             args = ['-s', 'resolve', 'FETCH_HEAD']
