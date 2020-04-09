@@ -351,6 +351,11 @@ class Gearman(object):
         build = Build(job, uuid)
         build.parameters = params
 
+        if params.get('ZUUL_NO_TRIGGER', False):
+            self.log.info('Parameter ZUUL_NO_TRIGGER was enabled. Skipping launch and returning SUCCESS')
+            self.sched.onBuildCompleted(build, 'SUCCESS')
+            return build
+
         if job.name == 'noop':
             self.sched.onBuildCompleted(build, 'SUCCESS')
             return build
