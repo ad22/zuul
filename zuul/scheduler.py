@@ -483,6 +483,8 @@ class Scheduler(threading.Thread):
                     open=require.get('open'),
                     current_patchset=require.get('current-patchset'),
                     statuses=toList(require.get('status')),
+                    wip=require.get('wip'),
+                    private=require.get('private'),
                     required_approvals=toList(require.get('approval')),
                     reject_approvals=toList(reject.get('approval'))
                 )

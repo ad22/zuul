@@ -43,6 +43,8 @@ class LayoutSchema(object):
 
     require = {'approval': toList(approval),
                'open': bool,
+               'wip': bool,
+               'private': bool,
                'current-patchset': bool,
                'status': toList(str)}
 

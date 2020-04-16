@@ -95,6 +95,8 @@ def getSchema():
         v.Required('event'):
             toList(v.Any('patchset-created',
                          'draft-published',
+                         'wip-state-changed',
+                         'private-state-changed',
                          'change-abandoned',
                          'change-restored',
                          'change-merged',

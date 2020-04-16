@@ -85,6 +85,8 @@ class GerritEventConnector(threading.Thread):
         # in cmd-stream-events.html
         accountfield_from_type = {
             'patchset-created': 'uploader',
+            'wip-state-changed': 'uploader',
+            'private-state-changed': 'uploader',
             'draft-published': 'uploader',  # Gerrit 2.5/2.6
             'change-abandoned': 'abandoner',
             'change-restored': 'restorer',

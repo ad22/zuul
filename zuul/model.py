@@ -949,6 +949,8 @@ class Change(Changeish):
         self.open = None
         self.status = None
         self.owner = None
+        self.wip = None
+        self.private = None
 
     def _id(self):
         return '%s,%s' % (self.number, self.patchset)
@@ -1325,6 +1327,7 @@ class EventFilter(BaseFilter):
 
 class ChangeishFilter(BaseFilter):
     def __init__(self, open=None, current_patchset=None,
+                 wip=None, private=None,
                  statuses=[], required_approvals=[],
                  reject_approvals=[]):
         super(ChangeishFilter, self).__init__(
@@ -1333,12 +1336,18 @@ class ChangeishFilter(BaseFilter):
         self.open = open
         self.current_patchset = current_patchset
         self.statuses = statuses
+        self.wip = wip
+        self.private = private
 
     def __repr__(self):
         ret = '<ChangeishFilter'
 
         if self.open is not None:
             ret += ' open: %s' % self.open
+        if self.wip is not None:
+            ret += ' wip: %s' % self.wip
+        if self.private is not None:
+            ret += ' private: %s' % self.private
         if self.current_patchset is not None:
             ret += ' current-patchset: %s' % self.current_patchset
         if self.statuses:
@@ -1356,6 +1365,14 @@ class ChangeishFilter(BaseFilter):
     def matches(self, change):
         if self.open is not None:
             if self.open != change.open:
+                return False
+
+        if self.wip is not None:
+            if self.wip != change.wip:
+                return False
+
+        if self.private is not None:
+            if self.private != change.private:
                 return False
 
         if self.current_patchset is not None:

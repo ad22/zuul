@@ -278,6 +278,8 @@ class GerritSource(BaseSource):
         change.open = data['open']
         change.status = data['status']
         change.owner = data['owner']
+        change.wip = data.get('wip', False)
+        change.private = data.get('private', False)
 
         if change.is_merged:
             # This change is merged, so we don't need to look any further
