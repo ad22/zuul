@@ -1303,6 +1303,8 @@ class EventFilter(BaseFilter):
         for category, value in self.event_approvals.items():
             matches_approval = False
             for eapproval in event.approvals:
+                if 'oldValue' not in eapproval:
+                    continue
                 if (normalizeCategory(eapproval['description']) ==
                         normalizeCategory(category) and
                         int(eapproval['value']) == int(value)):
