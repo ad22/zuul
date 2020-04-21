@@ -159,6 +159,8 @@ class GerritSource(BaseSource):
         return change
 
     def _getChange(self, number, patchset, refresh=False, history=None):
+        number = str(number)
+        patchset = str(patchset)
         key = '%s,%s' % (number, patchset)
         change = self.connection.getCachedChange(key)
         if change and not refresh:
@@ -239,7 +241,7 @@ class GerritSource(BaseSource):
         change._data = data
 
         if change.patchset is None:
-            change.patchset = data['currentPatchSet']['number']
+            change.patchset = str(data['currentPatchSet']['number'])
 
         if 'project' not in data:
             found = False
@@ -261,13 +263,13 @@ class GerritSource(BaseSource):
         max_ps = 0
         files = []
         for ps in data['patchSets']:
-            if ps['number'] == change.patchset:
+            if int(ps['number']) == int(change.patchset):
                 change.refspec = ps['ref']
                 for f in ps.get('files', []):
                     files.append(f['file'])
             if int(ps['number']) > int(max_ps):
                 max_ps = ps['number']
-        if max_ps == change.patchset:
+        if int(max_ps) == int(change.patchset):
             change.is_current_patchset = True
         else:
             change.is_current_patchset = False
