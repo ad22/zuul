@@ -246,9 +246,10 @@ class GerritSource(BaseSource):
         if 'project' not in data:
             found = False
             start = time.time()
-            while time.time() - start < 15:
+            while time.time() - start < 75:
                 self.log.info("Change %s not found, retrying" % (change, ))
                 data = self.connection.query(change.number)
+                self.log.debug("Change replication retry debug: %s" % data)
                 if 'project' in data:
                     found = True
                     break

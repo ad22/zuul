@@ -289,7 +289,7 @@ class GerritConnection(BaseConnection):
     def review(self, project, change, message, action={}):
         cmd = 'gerrit review --project %s' % project
         if message:
-            cmd += ' --message "%s"' % message
+            cmd += ' --message \"%s\"' % message
         for key, val in action.items():
             if val is True:
                 cmd += ' --%s' % key
